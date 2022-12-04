@@ -28,7 +28,6 @@
         public static int Part2(string[] sample)
         {
             int total = 0;
-            List<List<char[]>> groups = new();
             List<char[]> group = new();
             foreach(var line in sample)
             {
@@ -36,7 +35,6 @@
                 group.Add(sack);
                 if(group.Count() == 3)
                 {
-                    groups.Add(group);
                     var common = group[0].Intersect(group[1]).Intersect(group[2]).ToArray();
                     total += GetPriority(common[0]);
                     group = new();
