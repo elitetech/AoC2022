@@ -1,6 +1,6 @@
-﻿namespace AoC2022_6
+﻿namespace AoC
 {
-    class AoC2022_6
+    class AoC
     {
         public static void Main()
         {
