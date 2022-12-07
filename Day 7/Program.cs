@@ -40,23 +40,20 @@
             var currentDir = string.Empty;
             foreach(var item in input)
             {
+                var itemParts = item.Split(' ');
                 if (item.Contains('$'))
                 {
                     if (!item.Contains("ls"))
                     {
-                        var dir = item.Split(' ')[2];
+                        var dir = itemParts[2];
                         if (dir != "..") currentDir = currentDir.Length == 0 ? dir : $"{currentDir}{dir}/";
                         else currentDir = GetParent(currentDir);
                     }
                 }
-                else
+                else if (itemParts[0] != "dir")
                 {
-                    var itemParts = item.Split(' ');
-                    if (itemParts[0] != "dir")
-                    {
-                        if (!directoryTree.ContainsKey(currentDir)) directoryTree.Add(currentDir, new());
-                        directoryTree[currentDir].Add(itemParts[1], int.Parse(itemParts[0]));
-                    }
+                    if (!directoryTree.ContainsKey(currentDir)) directoryTree.Add(currentDir, new());
+                    directoryTree[currentDir].Add(itemParts[1], int.Parse(itemParts[0]));
                 }
             }
         }
