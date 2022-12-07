@@ -14,8 +14,8 @@ namespace AoC2022
 
             var input = File.ReadAllLines("input.txt");
             SetupTree(input);
-            Console.WriteLine($"Part 1: {Part1(input)}");// not 905276
-            Console.WriteLine($"Part 2: {Part2(input)}");
+            Console.WriteLine($"Part 1: {Part1(input)}"); // 1390824
+            Console.WriteLine($"Part 2: {Part2(input)}"); // 7490863
         }
         
         public static int Part1(string[] input)
@@ -23,17 +23,9 @@ namespace AoC2022
             int total = 0;
             foreach(var directory in directoryTree)
             {
-                var dirs = directoryTree
-                    .Where(x => x.Key
-                        .StartsWith(directory.Key)).ToList();
-                var dirSize = dirs
-                        .Sum(x => x.Value
-                            .Sum(y => y.Value));
+                var dirSize = GetDirectorySize(directory);
                 if (directory.Key == "/") MinSpaceToFree = dirSize - (TotalSpace - SpaceRequired);
-                if (dirSize <= 100000)
-                {
-                    total += dirSize;
-                }
+                if (dirSize <= 100000) total += dirSize;
             }
             return total;
         }
@@ -43,17 +35,9 @@ namespace AoC2022
             var currentSelection = SpaceRequired;
             foreach (var directory in directoryTree)
             {
-                var dirs = directoryTree
-                    .Where(x => x.Key
-                        .StartsWith(directory.Key)).ToList();
-                var dirSize = dirs
-                    .Sum(x => x.Value
-                        .Sum(y => y.Value));
-                if (dirSize >= MinSpaceToFree && dirSize < currentSelection)
-                {
-                    currentSelection = dirSize;
-                    if (dirSize == MinSpaceToFree) return dirSize;
-                }
+                var dirSize = GetDirectorySize(directory);
+                if (dirSize == MinSpaceToFree) return dirSize;
+                if (dirSize >= MinSpaceToFree && dirSize < currentSelection) currentSelection = dirSize;
             }
             return currentSelection;
         }
@@ -64,21 +48,24 @@ namespace AoC2022
             foreach(var item in input)
             {
                 var itemParts = item.Split(' ');
-                if (itemParts[0] == "$")
+                if (itemParts[0] == "$" && itemParts[1] == "cd")
                 {
-                    if (itemParts[1] == "cd")
-                    {
-                        var dir = itemParts[2];
-                        if (dir != "..") currentDir = currentDir.Length == 0 ? dir : $"{currentDir}{dir}/";
-                        else currentDir = GetParent(currentDir);
-                        if (!directoryTree.ContainsKey(currentDir)) directoryTree.Add(currentDir, new());
-                    }
+                    var dir = itemParts[2];
+                    if (dir != "..") currentDir = currentDir.Length == 0 ? dir : $"{currentDir}{dir}/";
+                    else currentDir = GetParent(currentDir);
+                    if (!directoryTree.ContainsKey(currentDir)) directoryTree.Add(currentDir, new());
                 }
-                else if (itemParts[0] != "dir")
-                {
-                    directoryTree[currentDir].Add(itemParts[1], int.Parse(itemParts[0]));
-                }
+                else if (itemParts[0] != "$" && itemParts[0] != "dir") directoryTree[currentDir].Add(itemParts[1], int.Parse(itemParts[0]));
             }
+        }
+
+        private static int GetDirectorySize(KeyValuePair<string, Dictionary<string, int>> directory)
+        {
+            return directoryTree
+                .Where(x => x.Key
+                    .StartsWith(directory.Key))
+                .Sum(x => x.Value
+                    .Sum(y => y.Value));
         }
 
         private static string GetParent(string directory)
